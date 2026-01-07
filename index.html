@@ -21,8 +21,6 @@
         }
         header::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.2)); z-index: 1; }
         .header-titles { position: relative; z-index: 2; }
-        .header-titles h1 { margin: 0; font-size: 2.8rem; font-weight: 700; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); }
-        .header-titles p { margin: 5px 0 0; font-size: 1.1rem; opacity: 0.9; font-weight: 400; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 20px; display: inline-block; }
         .header-actions { position: relative; z-index: 2; display: flex; gap: 10px; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px; }
         .stat-card { background: var(--card-bg); padding: 20px; border-radius: 15px; border-bottom: 4px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
@@ -56,7 +54,7 @@
     <header>
         <div class="header-titles">
             <h1>ລະບົບຈັດການວຽກ ໄກສອນ</h1>
-            <p id="visitDate">Date: ---</p>
+            <p>Art's Task Manager (Global Sorting Enabled ↕️)</p>
         </div>
         <div class="header-actions no-print">
             <button class="btn" style="background:rgba(255,255,255,0.3); color:white" onclick="window.print()">Print List</button>
@@ -130,19 +128,6 @@
   window.sortCol = 'status';
   window.sortDir = 'asc';
 
-  // --- NEW DATE FIX ---
-  function updateVisitDate() {
-      const dateEl = document.getElementById('visitDate');
-      if (dateEl) {
-          const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-          dateEl.innerText = "Visit Date: " + new Date().toLocaleDateString('en-US', options);
-      }
-  }
-  
-  // Run it immediately and when window loads
-  updateVisitDate();
-  window.onload = updateVisitDate;
-
   onValue(taskRef, (snapshot) => {
     const data = snapshot.val();
     window.tasks = data ? Object.values(data) : [];
@@ -177,9 +162,6 @@
     });
     saveToCloud();
     document.getElementById('taskTitle').value = '';
-    document.getElementById('assignee').value = '';
-    document.getElementById('dueDate').value = '';
-    document.getElementById('localPath').value = '';
   };
 
   window.renderTasks = function() {
@@ -190,13 +172,15 @@
 
     const statusScores = { "Not Started Yet": 1, "Pending/In Progress": 2, "Done/Completed": 3 };
 
+    // --- GLOBAL SORTING ENGINE ---
     const sorted = [...window.tasks].sort((a, b) => {
         let valA, valB;
+        
         if (window.sortCol === 'status') {
             valA = statusScores[a.status] || 0;
             valB = statusScores[b.status] || 0;
         } else if (window.sortCol === 'priority') {
-            valA = a.priority;
+            valA = a.priority; // Values are "3-High", "2-Medium", etc.
             valB = b.priority;
         } else if (window.sortCol === 'progress') {
             valA = parseInt(a.progress);
@@ -205,6 +189,7 @@
             valA = (a[window.sortCol] || "").toLowerCase();
             valB = (b[window.sortCol] || "").toLowerCase();
         }
+
         if (valA < valB) return window.sortDir === 'asc' ? -1 : 1;
         if (valA > valB) return window.sortDir === 'asc' ? 1 : -1;
         return 0;
