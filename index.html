@@ -7,85 +7,45 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1a2a3a; 
-            --accent: #3498db;  
-            --success: #27ae60;
-            --success-light: #eafaf1;
-            --warning: #f39c12;
-            --warning-light: #fff9eb;
-            --neutral: #95a5a6;
-            --neutral-light: #f8f9fa;
-            --danger: #e74c3c;
-            --bg: #f0f2f5;
-            --card-bg: #ffffff;
-            --text-dark: #2c3e50;
+            --primary: #1a2a3a; --accent: #3498db; --success: #27ae60; --success-light: #eafaf1;
+            --warning: #f39c12; --warning-light: #fff9eb; --neutral: #95a5a6; --danger: #e74c3c;
+            --bg: #f0f2f5; --card-bg: #ffffff; --text-dark: #2c3e50;
         }
-
         body { font-family: 'Inter', 'Noto Sans Lao', sans-serif; background-color: var(--bg); color: var(--text-dark); margin: 0; padding: 20px; }
         .container { max-width: 1400px; margin: 0 auto; }
-
         header {
-            position: relative;
-            display: flex; justify-content: space-between; align-items: center;
+            position: relative; display: flex; justify-content: space-between; align-items: center;
             background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Great_Wave_off_Kanagawa2.jpg/1280px-Great_Wave_off_Kanagawa2.jpg');
-            background-size: cover; background-position: center 40%;
-            padding: 4rem 2.5rem; border-radius: 20px;
-            color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 30px;
-            overflow: hidden;
+            background-size: cover; background-position: center 40%; padding: 4rem 2.5rem; border-radius: 20px;
+            color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 30px; overflow: hidden;
         }
-        
-        header::before {
-            content: "";
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.2));
-            z-index: 1;
-        }
-
+        header::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.2)); z-index: 1; }
         .header-titles { position: relative; z-index: 2; }
-        .header-titles h1 { margin: 0; font-size: 2.8rem; font-weight: 700; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); }
-        .header-titles p { margin: 5px 0 0; font-size: 1.3rem; opacity: 0.9; font-weight: 300; }
-
         .header-actions { position: relative; z-index: 2; display: flex; gap: 10px; }
-
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px; }
         .stat-card { background: var(--card-bg); padding: 20px; border-radius: 15px; border-bottom: 4px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .stat-card h3 { margin: 0; font-size: 2rem; color: var(--primary); }
-        
-        .search-container { margin-bottom: 25px; }
-        .search-bar { 
-            width: 100%; padding: 18px 25px; border-radius: 15px; border: 1px solid #ddd; 
-            font-size: 1.1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); outline: none;
-            transition: 0.3s;
-        }
-
+        .search-bar { width: 100%; padding: 18px 25px; border-radius: 15px; border: 1px solid #ddd; font-size: 1.1rem; outline: none; transition: 0.3s; margin-bottom: 25px; }
         .form-section { background: var(--card-bg); padding: 25px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-
         label { font-size: 0.8rem; font-weight: 600; color: #666; margin-bottom: 6px; display: block; }
         input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 0.9rem; background: #fafafa; }
-
         .btn { padding: 12px 24px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.2s; }
         .btn-main { background: var(--accent); color: white; }
-        
         .table-container { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; }
-        th { background: #f8f9fa; color: #888; padding: 18px; text-align: left; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; border-bottom: 2px solid #eee; }
+        th { background: #f8f9fa; color: #888; padding: 18px; text-align: left; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; border-bottom: 2px solid #eee; transition: 0.2s; }
+        th:hover { background: #eee; color: var(--accent); }
         td { padding: 18px; border-bottom: 1px solid #f1f2f6; font-size: 0.95rem; }
-
         .row-done { background-color: var(--success-light); }
         .row-pending { background-color: var(--warning-light); }
-        
         .badge { padding: 5px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; }
         .prio-High { background: #ff7675; color: white; }
         .prio-Medium { background: #ffeaa7; color: #d6a01d; }
         .prio-Low { background: #55efc4; color: #00b894; }
-
         .progress-bar { height: 8px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 8px; }
         .progress-fill { height: 100%; transition: width 0.4s ease; }
-        
         .status-select { background: transparent; border: 1px solid #ddd; padding: 5px; border-radius: 5px; font-weight: 600; cursor: pointer; }
-
-        @media print { .no-print { display: none; } header { padding: 2rem; background-image: none !important; color: black; } header::before { display: none; } }
+        @media print { .no-print { display: none; } header { padding: 2rem; background-image: none !important; color: black; } }
     </style>
 </head>
 <body>
@@ -94,7 +54,7 @@
     <header>
         <div class="header-titles">
             <h1>ລະບົບຈັດການວຽກ ໄກສອນ</h1>
-            <p>Art's Task Manager (Cloud Sync Active ☁️)</p>
+            <p>Art's Task Manager (Global Sorting Enabled ↕️)</p>
         </div>
         <div class="header-actions no-print">
             <button class="btn" style="background:rgba(255,255,255,0.3); color:white" onclick="window.print()">Print List</button>
@@ -109,13 +69,11 @@
         <div class="stat-card" style="border-bottom-color: var(--danger)"><h3><span id="statOverdue">0</span></h3><p>Late</p></div>
     </div>
 
-    <div class="search-container no-print">
-        <input type="text" id="globalSearch" class="search-bar" placeholder="🔍 Search tasks..." onkeyup="renderTasks()">
-    </div>
+    <input type="text" id="globalSearch" class="search-bar no-print" placeholder="🔍 Search by Task Name or Assignee..." onkeyup="renderTasks()">
 
     <div class="form-section no-print">
         <div class="grid-inputs">
-            <div><label>Task Name</label><input type="text" id="taskTitle" placeholder="Enter task..."></div>
+            <div><label>Task Name</label><input type="text" id="taskTitle"></div>
             <div><label>Priority</label>
                 <select id="taskPriority">
                     <option value="3-High">High</option>
@@ -123,12 +81,10 @@
                     <option value="1-Low">Low</option>
                 </select>
             </div>
-            <div><label>Assignee</label><input type="text" id="assignee" placeholder="Name"></div>
+            <div><label>Assignee</label><input type="text" id="assignee"></div>
             <div><label>Deadline</label><input type="date" id="dueDate"></div>
-            <div><label>File Path</label><input type="text" id="localPath" placeholder="D:\Desktop"></div>
-            <div style="display: flex; align-items: flex-end;">
-                <button class="btn btn-main" onclick="addTask()" style="width:100%">+ Add Task</button>
-            </div>
+            <div><label>File Path</label><input type="text" id="localPath"></div>
+            <div style="display: flex; align-items: flex-end;"><button class="btn btn-main" onclick="addTask()" style="width:100%">+ Add Task</button></div>
         </div>
     </div>
 
@@ -136,14 +92,12 @@
         <table>
             <thead>
                 <tr>
-                    <th>Task Description</th>
-                    <th>Priority</th>
-                    <th>Assignee</th>
-                    <th>Deadline</th>
-                    <th>Progress</th>
-                    <th onclick="toggleStatusSort()" style="cursor:pointer; background-color: #f1f1f1; transition: 0.3s;" onmouseover="this.style.backgroundColor='#ddd'" onmouseout="this.style.backgroundColor='#f1f1f1'">
-                        Status ↕️
-                    </th>
+                    <th onclick="setSort('title')">Task Description ↕</th>
+                    <th onclick="setSort('priority')">Priority ↕</th>
+                    <th onclick="setSort('assignee')">Assignee ↕</th>
+                    <th onclick="setSort('dueDate')">Deadline ↕</th>
+                    <th onclick="setSort('progress')">Progress ↕</th>
+                    <th onclick="setSort('status')">Status ↕</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -159,11 +113,11 @@
   const firebaseConfig = {
     apiKey: "AIzaSyDqXJSQnTZbdU1hVUD3hb7mpBn-eqfBLIg",
     authDomain: "arttaskmanager-31209.firebaseapp.com",
+    databaseURL: "https://arttaskmanager-31209-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "arttaskmanager-31209",
     storageBucket: "arttaskmanager-31209.firebasestorage.app",
     messagingSenderId: "773365096868",
-    appId: "1:773365096868:web:9e0d25edebdd87c2df2131",
-    databaseURL: "https://arttaskmanager-31209-default-rtdb.asia-southeast1.firebasedatabase.app"
+    appId: "1:773365096868:web:9e0d25edebdd87c2df2131"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -171,7 +125,8 @@
   const taskRef = ref(db, 'tasks/');
 
   window.tasks = [];
-  window.currentSortOrder = 'asc';
+  window.sortCol = 'status';
+  window.sortDir = 'asc';
 
   onValue(taskRef, (snapshot) => {
     const data = snapshot.val();
@@ -182,9 +137,19 @@
 
   window.saveToCloud = () => set(taskRef, window.tasks);
 
+  window.setSort = (col) => {
+    if (window.sortCol === col) {
+        window.sortDir = window.sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+        window.sortCol = col;
+        window.sortDir = 'asc';
+    }
+    renderTasks();
+  };
+
   window.addTask = function() {
     const title = document.getElementById('taskTitle').value;
-    if (!title) return alert("Please enter task name!");
+    if (!title) return alert("Enter task name!");
     window.tasks.push({
         id: Date.now(),
         title: title,
@@ -197,12 +162,6 @@
     });
     saveToCloud();
     document.getElementById('taskTitle').value = '';
-    document.getElementById('localPath').value = '';
-  };
-
-  window.toggleStatusSort = function() {
-    window.currentSortOrder = (window.currentSortOrder === 'asc') ? 'desc' : 'asc';
-    renderTasks();
   };
 
   window.renderTasks = function() {
@@ -211,32 +170,44 @@
     const today = new Date().toISOString().split('T')[0];
     tbody.innerHTML = '';
 
-    const scores = { "Not Started Yet": 1, "Pending/In Progress": 2, "Done/Completed": 3 };
+    const statusScores = { "Not Started Yet": 1, "Pending/In Progress": 2, "Done/Completed": 3 };
 
-    // --- SORTING LOGIC ---
-    const sortedTasks = [...window.tasks].sort((a, b) => {
-        let valA = scores[a.status] || 0;
-        let valB = scores[b.status] || 0;
-        return window.currentSortOrder === 'asc' ? valA - valB : valB - valA;
+    // --- GLOBAL SORTING ENGINE ---
+    const sorted = [...window.tasks].sort((a, b) => {
+        let valA, valB;
+        
+        if (window.sortCol === 'status') {
+            valA = statusScores[a.status] || 0;
+            valB = statusScores[b.status] || 0;
+        } else if (window.sortCol === 'priority') {
+            valA = a.priority; // Values are "3-High", "2-Medium", etc.
+            valB = b.priority;
+        } else if (window.sortCol === 'progress') {
+            valA = parseInt(a.progress);
+            valB = parseInt(b.progress);
+        } else {
+            valA = (a[window.sortCol] || "").toLowerCase();
+            valB = (b[window.sortCol] || "").toLowerCase();
+        }
+
+        if (valA < valB) return window.sortDir === 'asc' ? -1 : 1;
+        if (valA > valB) return window.sortDir === 'asc' ? 1 : -1;
+        return 0;
     });
 
-    // --- FILTERING & RENDERING ---
-    sortedTasks.forEach(task => {
+    sorted.forEach(task => {
         if (task.title.toLowerCase().includes(query) || task.assignee.toLowerCase().includes(query)) {
             const isDone = task.status === 'Done/Completed';
-            const isPending = task.status === 'Pending/In Progress';
-            const rowClass = isDone ? 'row-done' : (isPending ? 'row-pending' : '');
-            
             const row = document.createElement('tr');
-            row.className = rowClass;
+            row.className = isDone ? 'row-done' : (task.status === 'Pending/In Progress' ? 'row-pending' : '');
             row.innerHTML = `
                 <td><strong>${task.title}</strong></td>
                 <td><span class="badge prio-${task.priority.split('-')[1]}">${task.priority.split('-')[1]}</span></td>
                 <td>${task.assignee || '---'}</td>
                 <td style="color:${task.dueDate < today && !isDone ? 'var(--danger)' : 'inherit'}">${task.dueDate || '---'}</td>
-                <td style="width: 150px">
+                <td>
                     <div class="progress-bar"><div class="progress-fill" style="width:${task.progress}%; background:var(--accent)"></div></div>
-                    <input type="range" value="${task.progress}" onchange="updateProgress(${task.id}, this.value)" style="width:100%">
+                    <input type="range" value="${task.progress}" onchange="updateProgress(${task.id}, this.value)" style="width:100%" class="no-print">
                 </td>
                 <td>
                     <select onchange="updateStatus(${task.id}, this.value)" class="status-select">
@@ -245,9 +216,7 @@
                         <option ${task.status === 'Done/Completed' ? 'selected' : ''}>Done/Completed</option>
                     </select>
                 </td>
-                <td>
-                    <button onclick="deleteTask(${task.id})" style="border:none; background:none; cursor:pointer; color:#ccc">✕</button>
-                </td>
+                <td><button onclick="deleteTask(${task.id})" style="border:none; background:none; cursor:pointer; color:#ccc">✕</button></td>
             `;
             tbody.appendChild(row);
         }
@@ -290,8 +259,7 @@
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'Arts_Office_Report.csv';
-    a.click();
+    a.download = 'Arts_Office_Report.csv'; a.click();
   };
 </script>
 </body>
