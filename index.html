@@ -136,12 +136,14 @@
         <table>
             <thead>
                 <tr>
-                    <th onclick="sortTasks('title')">Task Description ↕</th>
-                    <th onclick="sortTasks('priority')">Priority ↕</th>
-                    <th onclick="sortTasks('assignee')">Assignee ↕</th>
-                    <th onclick="sortTasks('dueDate')">Deadline ↕</th>
+                    <th>Task Description</th>
+                    <th>Priority</th>
+                    <th>Assignee</th>
+                    <th>Deadline</th>
                     <th>Progress</th>
-                    <th>Status</th>
+                    <th onclick="toggleStatusSort()" style="cursor:pointer; background-color: #f1f1f1; transition: 0.3s;" onmouseover="this.style.backgroundColor='#ddd'" onmouseout="this.style.backgroundColor='#f1f1f1'">
+                        Status ↕️
+                    </th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -154,7 +156,6 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  // --- YOUR FIREBASE CONFIGURATION (Line 169) ---
   const firebaseConfig = {
     apiKey: "AIzaSyDqXJSQnTZbdU1hVUD3hb7mpBn-eqfBLIg",
     authDomain: "arttaskmanager-31209.firebaseapp.com",
@@ -162,17 +163,16 @@
     storageBucket: "arttaskmanager-31209.firebasestorage.app",
     messagingSenderId: "773365096868",
     appId: "1:773365096868:web:9e0d25edebdd87c2df2131",
-    // UPDATE THIS LINE BELOW:
     databaseURL: "https://arttaskmanager-31209-default-rtdb.asia-southeast1.firebasedatabase.app"
   };
+
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
   const taskRef = ref(db, 'tasks/');
 
-  // Global variables to work with the UI
   window.tasks = [];
+  window.currentSortOrder = 'asc';
 
-  // Listen for changes from Firebase
   onValue(taskRef, (snapshot) => {
     const data = snapshot.val();
     window.tasks = data ? Object.values(data) : [];
@@ -180,7 +180,6 @@
     updateStats();
   });
 
-  // Push data to Firebase
   window.saveToCloud = () => set(taskRef, window.tasks);
 
   window.addTask = function() {
@@ -201,41 +200,57 @@
     document.getElementById('localPath').value = '';
   };
 
+  window.toggleStatusSort = function() {
+    window.currentSortOrder = (window.currentSortOrder === 'asc') ? 'desc' : 'asc';
+    renderTasks();
+  };
+
   window.renderTasks = function() {
     const tbody = document.getElementById('taskBody');
     const query = document.getElementById('globalSearch').value.toLowerCase();
     const today = new Date().toISOString().split('T')[0];
     tbody.innerHTML = '';
 
-    window.tasks.filter(t => t.title.toLowerCase().includes(query) || t.assignee.toLowerCase().includes(query))
-    .forEach(task => {
-        const isDone = task.status === 'Done/Completed';
-        const isPending = task.status === 'Pending/In Progress';
-        const rowClass = isDone ? 'row-done' : (isPending ? 'row-pending' : '');
-        
-        const row = document.createElement('tr');
-        row.className = rowClass;
-        row.innerHTML = `
-            <td><strong>${task.title}</strong></td>
-            <td><span class="badge prio-${task.priority.split('-')[1]}">${task.priority.split('-')[1]}</span></td>
-            <td>${task.assignee || '---'}</td>
-            <td style="color:${task.dueDate < today && !isDone ? 'var(--danger)' : 'inherit'}">${task.dueDate || '---'}</td>
-            <td style="width: 150px">
-                <div class="progress-bar"><div class="progress-fill" style="width:${task.progress}%; background:var(--accent)"></div></div>
-                <input type="range" value="${task.progress}" onchange="updateProgress(${task.id}, this.value)" style="width:100%">
-            </td>
-            <td>
-                <select onchange="updateStatus(${task.id}, this.value)" class="status-select">
-                    <option ${task.status === 'Not Started Yet' ? 'selected' : ''}>Not Started Yet</option>
-                    <option ${task.status === 'Pending/In Progress' ? 'selected' : ''}>Pending/In Progress</option>
-                    <option ${task.status === 'Done/Completed' ? 'selected' : ''}>Done/Completed</option>
-                </select>
-            </td>
-            <td>
-                <button onclick="deleteTask(${task.id})" style="border:none; background:none; cursor:pointer; color:#ccc">✕</button>
-            </td>
-        `;
-        tbody.appendChild(row);
+    const scores = { "Not Started Yet": 1, "Pending/In Progress": 2, "Done/Completed": 3 };
+
+    // --- SORTING LOGIC ---
+    const sortedTasks = [...window.tasks].sort((a, b) => {
+        let valA = scores[a.status] || 0;
+        let valB = scores[b.status] || 0;
+        return window.currentSortOrder === 'asc' ? valA - valB : valB - valA;
+    });
+
+    // --- FILTERING & RENDERING ---
+    sortedTasks.forEach(task => {
+        if (task.title.toLowerCase().includes(query) || task.assignee.toLowerCase().includes(query)) {
+            const isDone = task.status === 'Done/Completed';
+            const isPending = task.status === 'Pending/In Progress';
+            const rowClass = isDone ? 'row-done' : (isPending ? 'row-pending' : '');
+            
+            const row = document.createElement('tr');
+            row.className = rowClass;
+            row.innerHTML = `
+                <td><strong>${task.title}</strong></td>
+                <td><span class="badge prio-${task.priority.split('-')[1]}">${task.priority.split('-')[1]}</span></td>
+                <td>${task.assignee || '---'}</td>
+                <td style="color:${task.dueDate < today && !isDone ? 'var(--danger)' : 'inherit'}">${task.dueDate || '---'}</td>
+                <td style="width: 150px">
+                    <div class="progress-bar"><div class="progress-fill" style="width:${task.progress}%; background:var(--accent)"></div></div>
+                    <input type="range" value="${task.progress}" onchange="updateProgress(${task.id}, this.value)" style="width:100%">
+                </td>
+                <td>
+                    <select onchange="updateStatus(${task.id}, this.value)" class="status-select">
+                        <option ${task.status === 'Not Started Yet' ? 'selected' : ''}>Not Started Yet</option>
+                        <option ${task.status === 'Pending/In Progress' ? 'selected' : ''}>Pending/In Progress</option>
+                        <option ${task.status === 'Done/Completed' ? 'selected' : ''}>Done/Completed</option>
+                    </select>
+                </td>
+                <td>
+                    <button onclick="deleteTask(${task.id})" style="border:none; background:none; cursor:pointer; color:#ccc">✕</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        }
     });
   };
 
@@ -281,5 +296,3 @@
 </script>
 </body>
 </html>
-
-
