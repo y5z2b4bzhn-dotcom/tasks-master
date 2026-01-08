@@ -50,17 +50,46 @@
         
         .editable { cursor: text; padding: 2px 4px; border-radius: 4px; transition: 0.2s; border: 1px solid transparent; }
         .editable:hover { background: #f0f7ff; border: 1px dashed var(--accent); }
-        .editable:focus { background: #fff; border: 1px solid var(--accent); outline: none; }
 
         .row-done { background-color: var(--success-light); }
         .row-pending { background-color: var(--warning-light); }
         .badge { padding: 2px 6px; border-radius: 5px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+        .prio-High { background: #ff7675; color: white; }
+        .prio-Medium { background: #ffeaa7; color: #d6a01d; }
+        .prio-Low { background: #55efc4; color: #00b894; }
+
+        .progress-bar { height: 5px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 4px; }
+        .progress-fill { height: 100%; transition: width 0.4s ease; }
+        .status-select, .prio-select { background: transparent; border: 1px solid #ddd; padding: 2px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; font-family: 'Times New Roman', serif; }
         
+        /* --- CRITICAL PRINT FIXES --- */
         @media print { 
-            .no-print { display: none !important; } 
-            header { background-image: none !important; color: black !important; }
+            .no-print, .no-print *, button, .search-bar, .form-section, input[type="range"] { 
+                display: none !important; 
+            } 
+            body { padding: 0; background: white; color: black; }
+            .container { max-width: 100%; margin: 0; }
+            header { 
+                padding: 10px; 
+                background-image: none !important; 
+                color: black; 
+                border-bottom: 2px solid black; 
+                box-shadow: none;
+                margin-bottom: 10px;
+            }
             header::before { display: none; }
-            body { background: white; }
+            .header-titles h1, .header-titles h2, .header-titles p { 
+                color: black; 
+                text-shadow: none; 
+                background: none; 
+                padding: 0; 
+                margin: 0;
+            }
+            .table-container { box-shadow: none; }
+            table { width: 100%; border: 1px solid #000; }
+            th, td { border: 1px solid #ddd; padding: 5px; color: black !important; }
+            .row-done, .row-pending { background: none !important; }
+            .badge { border: 1px solid #000; color: black !important; background: none !important; }
         }
     </style>
 </head>
@@ -74,19 +103,19 @@
             <p id="visitDate">---</p>
         </div>
         <div class="header-actions no-print">
-            <button class="btn" style="background:rgba(255,255,255,0.4); color:white" onclick="window.triggerPrint()">Print List</button>
+            <button class="btn" style="background:rgba(255,255,255,0.4); color:white" onclick="window.print()">Print List</button>
             <button class="btn" style="background:var(--success); color:white" onclick="window.exportToExcel()">Export Excel</button>
         </div>
     </header>
 
-    <div class="stats-grid">
+    <div class="stats-grid no-print">
         <div class="stat-card"><h3><span id="statTotal">0</span></h3><p>Total</p></div>
         <div class="stat-card" style="border-bottom-color: var(--warning)"><h3><span id="statPending">0</span></h3><p>Pending</p></div>
         <div class="stat-card" style="border-bottom-color: var(--success)"><h3><span id="statDone">0</span></h3><p>Done</p></div>
         <div class="stat-card" style="border-bottom-color: var(--danger)"><h3><span id="statOverdue">0</span></h3><p>Late</p></div>
     </div>
 
-    <input type="text" id="globalSearch" class="search-bar no-print" placeholder="🔍 Search tasks..." onkeyup="window.renderTasks()">
+    <input type="text" id="globalSearch" class="search-bar no-print" placeholder="🔍 Search tasks..." onkeyup="renderTasks()">
 
     <div class="form-section no-print">
         <div class="grid-inputs">
@@ -100,7 +129,7 @@
             </div>
             <div><label>Assignee</label><input type="text" id="assignee"></div>
             <div><label>Deadline</label><input type="date" id="dueDate"></div>
-            <div style="display: flex; align-items: flex-end;"><button class="btn btn-main" onclick="window.addTask()" style="width:100%">+ ADD</button></div>
+            <div style="display: flex; align-items: flex-end;"><button class="btn btn-main" onclick="addTask()" style="width:100%">+ ADD</button></div>
         </div>
     </div>
 
@@ -108,12 +137,12 @@
         <table>
             <thead>
                 <tr>
-                    <th onclick="window.setSort('title')">Description ↕</th>
-                    <th onclick="window.setSort('priority')">Priority ↕</th>
-                    <th onclick="window.setSort('assignee')">Assignee ↕</th>
-                    <th onclick="window.setSort('dueDate')">Deadline ↕</th>
-                    <th onclick="window.setSort('finishedDate')">Finished Date ↕</th>
-                    <th onclick="window.setSort('progress')">Progress ↕</th>
+                    <th onclick="setSort('title')">Description ↕</th>
+                    <th onclick="setSort('priority')">Priority ↕</th>
+                    <th onclick="setSort('assignee')">Assignee ↕</th>
+                    <th onclick="setSort('dueDate')">Deadline ↕</th>
+                    <th onclick="setSort('finishedDate')">Finished Date ↕</th>
+                    <th onclick="setSort('progress')">Progress ↕</th>
                     <th onclick="setSort('status')">Status ↕</th>
                     <th class="no-print">Action</th>
                 </tr>
@@ -122,31 +151,6 @@
         </table>
     </div>
 </div>
-
-<script>
-  window.triggerPrint = function() {
-    window.focus();
-    window.print();
-  };
-
-  window.exportToExcel = function() {
-    if (!window.tasks || window.tasks.length === 0) {
-        alert("No data available to export yet. Please wait for tasks to load.");
-        return;
-    }
-    
-    let csv = "\uFEFFTask,Priority,Assignee,Deadline,Finished,Status\n";
-    window.tasks.forEach(t => {
-        csv += `"${t.title || ''}","${(t.priority || '').split('-')[1] || ''}","${t.assignee || ''}","${t.dueDate || ''}","${t.finishedDate || ''}","${t.status || ''}"\n`;
-    });
-
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "Kaysone_Tasks.csv";
-    link.click();
-  };
-</script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -169,6 +173,29 @@
   window.tasks = [];
   window.sortCol = 'status';
   window.sortDir = 'asc';
+
+  // --- EXCEL EXPORT ---
+  window.exportToExcel = function() {
+    if (window.tasks.length === 0) return alert("No tasks to export.");
+    let csv = "\uFEFFTask,Priority,Assignee,Deadline,Finished,Status\n";
+    window.tasks.forEach(t => {
+        csv += `"${t.title}","${t.priority.split('-')[1]}","${t.assignee}","${t.dueDate}","${t.finishedDate}","${t.status}"\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "Kaysone_Tasks.csv";
+    link.click();
+  };
+
+  function updateVisitDate() {
+      const dateEl = document.getElementById('visitDate');
+      if (dateEl) {
+          const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+          dateEl.innerText = new Date().toLocaleDateString('en-US', options);
+      }
+  }
+  updateVisitDate();
 
   onValue(taskRef, (snapshot) => {
     const data = snapshot.val();
@@ -193,8 +220,7 @@
         priority: document.getElementById('taskPriority').value,
         assignee: document.getElementById('assignee').value || '---',
         dueDate: document.getElementById('dueDate').value || '',
-        finishedDate: '',
-        status: 'Not Started Yet', progress: 0
+        finishedDate: '', status: 'Not Started Yet', progress: 0
     });
     saveToCloud();
     document.getElementById('taskTitle').value = '';
@@ -203,10 +229,7 @@
 
   window.updateField = (id, field, value) => {
     const t = window.tasks.find(t => t.id === id);
-    if(t && t[field] !== value) {
-        t[field] = value;
-        saveToCloud();
-    }
+    if(t && t[field] !== value) { t[field] = value; saveToCloud(); }
   };
 
   window.renderTasks = function() {
@@ -269,7 +292,9 @@
         if(val === 'Done/Completed') {
             t.progress = 100;
             if(!t.finishedDate) t.finishedDate = new Date().toISOString().split('T')[0];
-        } else { t.finishedDate = ''; }
+        } else {
+            t.finishedDate = '';
+        }
         saveToCloud(); 
     }
   };
@@ -301,9 +326,6 @@
     document.getElementById('statPending').innerText = window.tasks.filter(t => t.status === 'Pending/In Progress').length;
     document.getElementById('statOverdue').innerText = window.tasks.filter(t => t.dueDate && t.dueDate < today && t.status !== 'Done/Completed').length;
   };
-  
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  document.getElementById('visitDate').innerText = new Date().toLocaleDateString('en-US', options);
 </script>
 </body>
 </html>
