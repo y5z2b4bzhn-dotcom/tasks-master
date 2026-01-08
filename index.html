@@ -15,7 +15,7 @@
             font-family: 'Times New Roman', Times, 'Noto Sans Lao', serif; 
             background-color: var(--bg); color: var(--text-dark); margin: 0; padding: 15px; 
         }
-        .container { max-width: 1450px; margin: 0 auto; }
+        .container { max-width: 1400px; margin: 0 auto; }
         header {
             position: relative; display: flex; justify-content: space-between; align-items: center;
             background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Great_Wave_off_Kanagawa2.jpg/1280px-Great_Wave_off_Kanagawa2.jpg');
@@ -40,7 +40,7 @@
         label { font-size: 0.75rem; font-weight: 600; color: #666; margin-bottom: 3px; display: block; text-transform: uppercase; }
         input, select { width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem; background: #fafafa; font-family: 'Times New Roman', 'Noto Sans Lao', serif; }
         
-        .btn { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; font-family: 'Times New Roman', serif; transition: 0.2s; }
+        .btn { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; font-family: 'Times New Roman', serif; }
         .btn-main { background: var(--accent); color: white; }
 
         .table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
@@ -54,22 +54,19 @@
 
         .row-done { background-color: var(--success-light); }
         .row-pending { background-color: var(--warning-light); }
+        .badge { padding: 2px 6px; border-radius: 5px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+
         .progress-bar { height: 5px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 4px; }
         .progress-fill { height: 100%; transition: width 0.4s ease; }
         .status-select, .prio-select { background: transparent; border: 1px solid #ddd; padding: 2px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; font-family: 'Times New Roman', serif; }
         
-        /* --- PRINT OPTIMIZATION --- */
         @media print { 
-            .no-print, .header-actions, .form-section, .search-bar, th:last-child, td:last-child, input[type="range"] { 
-                display: none !important; 
-            } 
-            header { background-image: none !important; color: black; border-bottom: 2px solid #000; padding: 10px 0; }
+            .no-print { display: none !important; } 
+            header { padding: 1rem; background-image: none !important; color: black; border: 1px solid #eee; }
             header::before { display: none; }
             body { background: white; padding: 0; }
             .container { max-width: 100%; }
-            .table-container { box-shadow: none; }
-            table { border: 1px solid #eee; }
-            th, td { border-bottom: 1px solid #eee; color: black !important; }
+            .table-container { box-shadow: none; border: 1px solid #eee; }
         }
     </style>
 </head>
@@ -84,18 +81,18 @@
         </div>
         <div class="header-actions no-print">
             <button class="btn" style="background:rgba(255,255,255,0.3); color:white" onclick="window.print()">Print List</button>
-            <button class="btn" style="background:var(--success); color:white" onclick="window.exportToCSV()">Excel Export</button>
+            <button class="btn" style="background:var(--success); color:white" onclick="exportToCSV()">Export Excel</button>
         </div>
     </header>
 
     <div class="stats-grid">
-        <div class="stat-card"><h3><span id="statTotal">0</span></h3><p>Total</p></div>
+        <div class="stat-card"><h3><span id="statTotal">0</span></h3><p>Total Tasks</p></div>
         <div class="stat-card" style="border-bottom-color: var(--warning)"><h3><span id="statPending">0</span></h3><p>Pending</p></div>
-        <div class="stat-card" style="border-bottom-color: var(--success)"><h3><span id="statDone">0</span></h3><p>Done</p></div>
-        <div class="stat-card" style="border-bottom-color: var(--danger)"><h3><span id="statOverdue">0</span></h3><p>Late</p></div>
+        <div class="stat-card" style="border-bottom-color: var(--success)"><h3><span id="statDone">0</span></h3><p>Completed</p></div>
+        <div class="stat-card" style="border-bottom-color: var(--danger)"><h3><span id="statOverdue">0</span></h3><p>Overdue</p></div>
     </div>
 
-    <input type="text" id="globalSearch" class="search-bar no-print" placeholder="🔍 Search tasks..." onkeyup="renderTasks()">
+    <input type="text" id="globalSearch" class="search-bar no-print" placeholder="🔍 Search tasks, assignees, or dates..." onkeyup="renderTasks()">
 
     <div class="form-section no-print">
         <div class="grid-inputs">
@@ -109,7 +106,7 @@
             </div>
             <div><label>Assignee</label><input type="text" id="assignee"></div>
             <div><label>Deadline</label><input type="date" id="dueDate"></div>
-            <div style="display: flex; align-items: flex-end;"><button class="btn btn-main" onclick="addTask()" style="width:100%">+ ADD</button></div>
+            <div style="display: flex; align-items: flex-end;"><button class="btn btn-main" onclick="addTask()" style="width:100%">+ ADD TASK</button></div>
         </div>
     </div>
 
@@ -180,23 +177,28 @@
 
   window.addTask = function() {
     const title = document.getElementById('taskTitle').value;
-    if (!title) return alert("Enter task!");
+    if (!title) return alert("Enter task description!");
     window.tasks.push({
-        id: Date.now(), title: title,
+        id: Date.now(), 
+        title: title,
         priority: document.getElementById('taskPriority').value,
         assignee: document.getElementById('assignee').value || '---',
         dueDate: document.getElementById('dueDate').value || '',
-        finishedDate: '', status: 'Not Started Yet', progress: 0
+        finishedDate: '',
+        status: 'Not Started Yet', 
+        progress: 0
     });
     saveToCloud();
     document.getElementById('taskTitle').value = '';
     document.getElementById('assignee').value = '';
   };
 
-  // Attach all functions to window for module scope access
   window.updateField = (id, field, value) => {
     const t = window.tasks.find(t => t.id === id);
-    if(t && t[field] !== value) { t[field] = value; saveToCloud(); }
+    if(t && t[field] !== value) {
+        t[field] = value;
+        saveToCloud();
+    }
   };
 
   window.updateStatus = (id, val) => {
@@ -205,7 +207,7 @@
         t.status = val; 
         if(val === 'Done/Completed') {
             t.progress = 100;
-            if(!t.finishedDate) t.finishedDate = new Date().toISOString().split('T')[0];
+            t.finishedDate = new Date().toISOString().split('T')[0];
         } else {
             t.finishedDate = '';
         }
@@ -219,23 +221,19 @@
         t.progress = val; 
         if(val == 100) {
             t.status = 'Done/Completed';
-            if(!t.finishedDate) t.finishedDate = new Date().toISOString().split('T')[0];
-        } else if (val > 0) {
-            t.status = 'Pending/In Progress';
-            t.finishedDate = '';
+            t.finishedDate = new Date().toISOString().split('T')[0];
         } else {
-            t.status = 'Not Started Yet';
+            if (val > 0) t.status = 'Pending/In Progress';
+            else t.status = 'Not Started Yet';
             t.finishedDate = '';
         }
         saveToCloud(); 
     }
   };
 
-  window.deleteTask = (id) => { if(confirm('Remove task?')) { window.tasks = window.tasks.filter(t => t.id !== id); saveToCloud(); } };
-
   window.renderTasks = function() {
     const tbody = document.getElementById('taskBody');
-    const query = (document.getElementById('globalSearch').value || "").toLowerCase();
+    const query = document.getElementById('globalSearch').value.toLowerCase();
     const today = new Date().toISOString().split('T')[0];
     tbody.innerHTML = '';
     const scores = { "Not Started Yet": 1, "Pending/In Progress": 2, "Done/Completed": 3 };
@@ -252,39 +250,42 @@
     });
 
     sorted.forEach(task => {
-        if (task.title.toLowerCase().includes(query) || (task.assignee && task.assignee.toLowerCase().includes(query))) {
+        const searchText = (task.title + task.assignee + task.status + task.finishedDate).toLowerCase();
+        if (searchText.includes(query)) {
             const isDone = task.status === 'Done/Completed';
             const row = document.createElement('tr');
             row.className = isDone ? 'row-done' : (task.status === 'Pending/In Progress' ? 'row-pending' : '');
             row.innerHTML = `
-                <td><div contenteditable="true" class="editable" onblur="window.updateField(${task.id}, 'title', this.innerText)">${task.title}</div></td>
+                <td><div contenteditable="true" class="editable" onblur="updateField(${task.id}, 'title', this.innerText)">${task.title}</div></td>
                 <td>
-                    <select onchange="window.updateField(${task.id}, 'priority', this.value)" class="prio-select">
+                    <select onchange="updateField(${task.id}, 'priority', this.value)" class="prio-select">
                         <option value="3-High" ${task.priority === '3-High' ? 'selected' : ''}>High</option>
                         <option value="2-Medium" ${task.priority === '2-Medium' ? 'selected' : ''}>Medium</option>
                         <option value="1-Low" ${task.priority === '1-Low' ? 'selected' : ''}>Low</option>
                     </select>
                 </td>
-                <td><div contenteditable="true" class="editable" onblur="window.updateField(${task.id}, 'assignee', this.innerText)">${task.assignee}</div></td>
-                <td><input type="date" value="${task.dueDate}" onchange="window.updateField(${task.id}, 'dueDate', this.value)" style="border:none; background:transparent; font-size:0.85rem; width:105px; color:${task.dueDate < today && !isDone ? 'var(--danger)' : 'inherit'}; font-weight:${task.dueDate < today && !isDone ? 'bold' : 'normal'}"></td>
-                <td><input type="date" value="${task.finishedDate || ''}" onchange="window.updateField(${task.id}, 'finishedDate', this.value)" style="border:none; background:transparent; font-size:0.85rem; width:105px;"></td>
+                <td><div contenteditable="true" class="editable" onblur="updateField(${task.id}, 'assignee', this.innerText)">${task.assignee}</div></td>
+                <td><input type="date" value="${task.dueDate}" onchange="updateField(${task.id}, 'dueDate', this.value)" style="border:none; background:transparent; font-size:0.85rem; width:105px; color:${task.dueDate < today && !isDone ? 'var(--danger)' : 'inherit'}; font-weight:${task.dueDate < today && !isDone ? 'bold' : 'normal'}"></td>
+                <td style="color:var(--success); font-weight:bold; font-size:0.85rem;">${task.finishedDate || '---'}</td>
                 <td>
                     <div class="progress-bar"><div class="progress-fill" style="width:${task.progress}%; background:var(--accent)"></div></div>
-                    <input type="range" value="${task.progress}" onchange="window.updateProgress(${task.id}, this.value)" style="width:100%" class="no-print">
+                    <input type="range" value="${task.progress}" onchange="updateProgress(${task.id}, this.value)" style="width:100%" class="no-print">
                 </td>
                 <td>
-                    <select onchange="window.updateStatus(${task.id}, this.value)" class="status-select">
+                    <select onchange="updateStatus(${task.id}, this.value)" class="status-select">
                         <option ${task.status === 'Not Started Yet' ? 'selected' : ''}>Not Started Yet</option>
                         <option ${task.status === 'Pending/In Progress' ? 'selected' : ''}>Pending/In Progress</option>
                         <option ${task.status === 'Done/Completed' ? 'selected' : ''}>Done/Completed</option>
                     </select>
                 </td>
-                <td class="no-print"><button onclick="window.deleteTask(${task.id})" style="border:none; background:none; cursor:pointer; color:#ccc">✕</button></td>
+                <td class="no-print"><button onclick="deleteTask(${task.id})" style="border:none; background:none; cursor:pointer; color:#ccc">✕</button></td>
             `;
             tbody.appendChild(row);
         }
     });
   };
+
+  window.deleteTask = (id) => { if(confirm('Remove task?')) { window.tasks = window.tasks.filter(t => t.id !== id); saveToCloud(); } };
 
   window.updateStats = function() {
     const today = new Date().toISOString().split('T')[0];
@@ -295,11 +296,14 @@
   };
 
   window.exportToCSV = function() {
-    let csv = '\uFEFFTitle,Priority,Assignee,Deadline,FinishedDate,Status\n';
-    window.tasks.forEach(t => csv += `"${t.title}","${t.priority}","${t.assignee}","${t.dueDate}","${t.finishedDate}","${t.status}"\n`);
+    let csv = '\uFEFFTitle,Priority,Assignee,Deadline,Finished Date,Status,Progress\n';
+    window.tasks.forEach(t => {
+        csv += `"${t.title}","${t.priority}","${t.assignee}","${t.dueDate}","${t.finishedDate || ''}","${t.status}","${t.progress}%"\n`;
+    });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = 'Tasks_Report.csv'; a.click();
+    a.download = `Kaysone_Tasks_${new Date().toISOString().split('T')[0]}.csv`; 
+    a.click();
   };
 </script>
 </body>
