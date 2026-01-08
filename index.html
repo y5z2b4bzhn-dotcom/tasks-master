@@ -1,278 +1,303 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ລະບົບຈັດການວຽກ ໄກສອນ | Art's Task Manager</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #1a2a3a; --accent: #3498db; --success: #27ae60; --success-light: #eafaf1;
-            --warning: #f39c12; --warning-light: #fff9eb; --neutral: #95a5a6; --danger: #e74c3c;
-            --bg: #f0f2f5; --card-bg: #ffffff; --text-dark: #2c3e50;
-        }
-        body { 
-            font-family: 'Times New Roman', Times, 'Noto Sans Lao', serif; 
-            background-color: var(--bg); color: var(--text-dark); margin: 0; padding: 15px; 
-        }
-        .container { max-width: 1400px; margin: 0 auto; }
-        header {
-            position: relative; display: flex; justify-content: space-between; align-items: center;
-            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Great_Wave_off_Kanagawa2.jpg/1280px-Great_Wave_off_Kanagawa2.jpg');
-            background-size: cover; background-position: center 40%; padding: 1.5rem 2rem; border-radius: 15px;
-            color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 20px; overflow: hidden;
-        }
-        header::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.2)); z-index: 1; }
-        .header-titles { position: relative; z-index: 2; }
-        .header-titles h1 { margin: 0; font-size: 1.8rem; font-weight: 700; font-family: 'Noto Sans Lao', serif; }
-        .header-titles h2 { margin: 2px 0; font-size: 1.2rem; font-weight: bold; font-style: italic; }
-        .header-titles p { margin: 5px 0 0; font-size: 0.9rem; background: rgba(0,0,0,0.3); padding: 3px 10px; border-radius: 12px; display: inline-block; }
-        
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: var(--card-bg); padding: 10px; border-radius: 12px; border-bottom: 3px solid var(--accent); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .stat-card h3 { margin: 0; font-size: 1.4rem; }
-        .stat-card p { margin: 0; font-size: 0.8rem; font-weight: bold; color: #666; text-transform: uppercase; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ລະບົບຈັດການວຽກ ໄກສອນ | Art's Task Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a2a3a; --accent: #3498db; --success: #27ae60; --success-light: #eafaf1;
+            --warning: #f39c12; --warning-light: #fff9eb; --neutral: #95a5a6; --danger: #e74c3c;
+            --bg: #f0f2f5; --card-bg: #ffffff; --text-dark: #2c3e50;
+        }
+        body { 
+            font-family: 'Times New Roman', Times, 'Noto Sans Lao', serif; 
+            background-color: var(--bg); color: var(--text-dark); margin: 0; padding: 15px; 
+        }
+        .container { max-width: 1450px; margin: 0 auto; }
+        header {
+            position: relative; display: flex; justify-content: space-between; align-items: center;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Great_Wave_off_Kanagawa2.jpg/1280px-Great_Wave_off_Kanagawa2.jpg');
+            background-size: cover; background-position: center 40%; padding: 1.5rem 2rem; border-radius: 15px;
+            color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 20px; overflow: hidden;
+        }
+        header::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.2)); z-index: 1; }
+        .header-titles { position: relative; z-index: 2; }
+        .header-titles h1 { margin: 0; font-size: 1.8rem; font-weight: 700; font-family: 'Noto Sans Lao', serif; }
+        .header-titles h2 { margin: 2px 0; font-size: 1.2rem; font-weight: bold; font-style: italic; }
+        .header-titles p { margin: 5px 0 0; font-size: 0.9rem; background: rgba(0,0,0,0.3); padding: 3px 10px; border-radius: 12px; display: inline-block; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: var(--card-bg); padding: 10px; border-radius: 12px; border-bottom: 3px solid var(--accent); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .stat-card h3 { margin: 0; font-size: 1.4rem; }
+        .stat-card p { margin: 0; font-size: 0.8rem; font-weight: bold; color: #666; text-transform: uppercase; }
 
-        .search-bar { width: 100%; padding: 10px 18px; border-radius: 10px; border: 1px solid #ddd; font-size: 0.95rem; margin-bottom: 15px; box-sizing: border-box; font-family: 'Times New Roman', serif; }
+        .search-bar { width: 100%; padding: 10px 18px; border-radius: 10px; border: 1px solid #ddd; font-size: 0.95rem; margin-bottom: 15px; box-sizing: border-box; font-family: 'Times New Roman', serif; }
 
-        .form-section { background: var(--card-bg); padding: 12px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
-        label { font-size: 0.75rem; font-weight: 600; color: #666; margin-bottom: 3px; display: block; text-transform: uppercase; }
-        input, select { width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem; background: #fafafa; font-family: 'Times New Roman', 'Noto Sans Lao', serif; }
-        
-        .btn { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; font-family: 'Times New Roman', serif; }
-        .btn-main { background: var(--accent); color: white; }
+        .form-section { background: var(--card-bg); padding: 12px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+        label { font-size: 0.75rem; font-weight: 600; color: #666; margin-bottom: 3px; display: block; text-transform: uppercase; }
+        input, select { width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem; background: #fafafa; font-family: 'Times New Roman', 'Noto Sans Lao', serif; }
+        
+        .btn { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; font-family: 'Times New Roman', serif; }
+        .btn-main { background: var(--accent); color: white; }
 
-        .table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8f9fa; color: #555; padding: 8px; text-align: left; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; border-bottom: 2px solid #eee; }
-        td { padding: 6px 10px; border-bottom: 1px solid #f1f2f6; font-size: 0.9rem; }
-        
-        /* Editable styling */
-        .editable { cursor: text; padding: 2px 4px; border-radius: 4px; transition: 0.2s; border: 1px solid transparent; }
-        .editable:hover { background: #f0f7ff; border: 1px dashed var(--accent); }
-        .editable:focus { background: #fff; border: 1px solid var(--accent); outline: none; }
+        .table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8f9fa; color: #555; padding: 8px; text-align: left; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; border-bottom: 2px solid #eee; }
+        td { padding: 6px 10px; border-bottom: 1px solid #f1f2f6; font-size: 0.9rem; }
+        
+        .editable { cursor: text; padding: 2px 4px; border-radius: 4px; transition: 0.2s; border: 1px solid transparent; }
+        .editable:hover { background: #f0f7ff; border: 1px dashed var(--accent); }
+        .editable:focus { background: #fff; border: 1px solid var(--accent); outline: none; }
 
-        .row-done { background-color: var(--success-light); }
-        .row-pending { background-color: var(--warning-light); }
-        .badge { padding: 2px 6px; border-radius: 5px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
-        .prio-High { background: #ff7675; color: white; }
-        .prio-Medium { background: #ffeaa7; color: #d6a01d; }
-        .prio-Low { background: #55efc4; color: #00b894; }
+        .row-done { background-color: var(--success-light); }
+        .row-pending { background-color: var(--warning-light); }
+        .badge { padding: 2px 6px; border-radius: 5px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+        .prio-High { background: #ff7675; color: white; }
+        .prio-Medium { background: #ffeaa7; color: #d6a01d; }
+        .prio-Low { background: #55efc4; color: #00b894; }
 
-        .progress-bar { height: 5px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 4px; }
-        .progress-fill { height: 100%; transition: width 0.4s ease; }
-        .status-select, .prio-select { background: transparent; border: 1px solid #ddd; padding: 2px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; font-family: 'Times New Roman', serif; }
-        
-        @media print { .no-print { display: none; } header { padding: 1rem; background-image: none !important; color: black; } }
-    </style>
+        .progress-bar { height: 5px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 4px; }
+        .progress-fill { height: 100%; transition: width 0.4s ease; }
+        .status-select, .prio-select { background: transparent; border: 1px solid #ddd; padding: 2px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; font-family: 'Times New Roman', serif; }
+        
+        @media print { .no-print { display: none; } header { padding: 1rem; background-image: none !important; color: black; } }
+    </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <div class="header-titles">
-            <h1>ລະບົບຈັດການວຽກ ໄກສອນ</h1>
-            <h2>Kaysone's Task Management</h2>
-            <p id="visitDate">---</p>
-        </div>
-        <div class="header-actions no-print">
-            <button class="btn" style="background:rgba(255,255,255,0.3); color:white" onclick="window.print()">Print</button>
-            <button class="btn" style="background:var(--success); color:white" onclick="exportToCSV()">Excel</button>
-        </div>
-    </header>
+    <header>
+        <div class="header-titles">
+            <h1>ລະບົບຈັດການວຽກ ໄກສອນ</h1>
+            <h2>Kaysone's Task Management</h2>
+            <p id="visitDate">---</p>
+        </div>
+        <div class="header-actions no-print">
+            <button class="btn" style="background:rgba(255,255,255,0.3); color:white" onclick="window.print()">Print</button>
+            <button class="btn" style="background:var(--success); color:white" onclick="exportToCSV()">Excel</button>
+        </div>
+    </header>
 
-    <div class="stats-grid">
-        <div class="stat-card"><h3><span id="statTotal">0</span></h3><p>Total</p></div>
-        <div class="stat-card" style="border-bottom-color: var(--warning)"><h3><span id="statPending">0</span></h3><p>Pending</p></div>
-        <div class="stat-card" style="border-bottom-color: var(--success)"><h3><span id="statDone">0</span></h3><p>Done</p></div>
-        <div class="stat-card" style="border-bottom-color: var(--danger)"><h3><span id="statOverdue">0</span></h3><p>Late</p></div>
-    </div>
+    <div class="stats-grid">
+        <div class="stat-card"><h3><span id="statTotal">0</span></h3><p>Total</p></div>
+        <div class="stat-card" style="border-bottom-color: var(--warning)"><h3><span id="statPending">0</span></h3><p>Pending</p></div>
+        <div class="stat-card" style="border-bottom-color: var(--success)"><h3><span id="statDone">0</span></h3><p>Done</p></div>
+        <div class="stat-card" style="border-bottom-color: var(--danger)"><h3><span id="statOverdue">0</span></h3><p>Late</p></div>
+    </div>
 
-    <input type="text" id="globalSearch" class="search-bar no-print" placeholder="🔍 Search tasks..." onkeyup="renderTasks()">
+    <input type="text" id="globalSearch" class="search-bar no-print" placeholder="🔍 Search tasks..." onkeyup="renderTasks()">
 
-    <div class="form-section no-print">
-        <div class="grid-inputs">
-            <div><label>Description</label><input type="text" id="taskTitle"></div>
-            <div><label>Priority</label>
-                <select id="taskPriority">
-                    <option value="3-High">High</option>
-                    <option value="2-Medium" selected>Medium</option>
-                    <option value="1-Low">Low</option>
-                </select>
-            </div>
-            <div><label>Assignee</label><input type="text" id="assignee"></div>
-            <div><label>Deadline</label><input type="date" id="dueDate"></div>
-            <div style="display: flex; align-items: flex-end;"><button class="btn btn-main" onclick="addTask()" style="width:100%">+ ADD</button></div>
-        </div>
-    </div>
+    <div class="form-section no-print">
+        <div class="grid-inputs">
+            <div><label>Description</label><input type="text" id="taskTitle"></div>
+            <div><label>Priority</label>
+                <select id="taskPriority">
+                    <option value="3-High">High</option>
+                    <option value="2-Medium" selected>Medium</option>
+                    <option value="1-Low">Low</option>
+                </select>
+            </div>
+            <div><label>Assignee</label><input type="text" id="assignee"></div>
+            <div><label>Deadline</label><input type="date" id="dueDate"></div>
+            <div style="display: flex; align-items: flex-end;"><button class="btn btn-main" onclick="addTask()" style="width:100%">+ ADD</button></div>
+        </div>
+    </div>
 
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th onclick="setSort('title')">Description ↕</th>
-                    <th onclick="setSort('priority')">Priority ↕</th>
-                    <th onclick="setSort('assignee')">Assignee ↕</th>
-                    <th onclick="setSort('dueDate')">Deadline ↕</th>
-                    <th onclick="setSort('progress')">Progress ↕</th>
-                    <th onclick="setSort('status')">Status ↕</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="taskBody"></tbody>
-        </table>
-    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th onclick="setSort('title')">Description ↕</th>
+                    <th onclick="setSort('priority')">Priority ↕</th>
+                    <th onclick="setSort('assignee')">Assignee ↕</th>
+                    <th onclick="setSort('dueDate')">Deadline ↕</th>
+                    <th onclick="setSort('finishedDate')">Finished Date ↕</th>
+                    <th onclick="setSort('progress')">Progress ↕</th>
+                    <th onclick="setSort('status')">Status ↕</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="taskBody"></tbody>
+        </table>
+    </div>
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDqXJSQnTZbdU1hVUD3hb7mpBn-eqfBLIg",
-    authDomain: "arttaskmanager-31209.firebaseapp.com",
-    databaseURL: "https://arttaskmanager-31209-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "arttaskmanager-31209",
-    storageBucket: "arttaskmanager-31209.firebasestorage.app",
-    messagingSenderId: "773365096868",
-    appId: "1:773365096868:web:9e0d25edebdd87c2df2131"
-  };
+  const firebaseConfig = {
+    apiKey: "AIzaSyDqXJSQnTZbdU1hVUD3hb7mpBn-eqfBLIg",
+    authDomain: "arttaskmanager-31209.firebaseapp.com",
+    databaseURL: "https://arttaskmanager-31209-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "arttaskmanager-31209",
+    storageBucket: "arttaskmanager-31209.firebasestorage.app",
+    messagingSenderId: "773365096868",
+    appId: "1:773365096868:web:9e0d25edebdd87c2df2131"
+  };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const taskRef = ref(db, 'tasks/');
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const taskRef = ref(db, 'tasks/');
 
-  window.tasks = [];
-  window.sortCol = 'status';
-  window.sortDir = 'asc';
+  window.tasks = [];
+  window.sortCol = 'status';
+  window.sortDir = 'asc';
 
-  function updateVisitDate() {
-      const dateEl = document.getElementById('visitDate');
-      if (dateEl) {
-          const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-          dateEl.innerText = new Date().toLocaleDateString('en-US', options);
-      }
-  }
-  updateVisitDate();
+  function updateVisitDate() {
+      const dateEl = document.getElementById('visitDate');
+      if (dateEl) {
+          const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+          dateEl.innerText = new Date().toLocaleDateString('en-US', options);
+      }
+  }
+  updateVisitDate();
 
-  onValue(taskRef, (snapshot) => {
-    const data = snapshot.val();
-    window.tasks = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
-    renderTasks();
-    updateStats();
-  });
+  onValue(taskRef, (snapshot) => {
+    const data = snapshot.val();
+    window.tasks = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+    renderTasks();
+    updateStats();
+  });
 
-  window.saveToCloud = () => set(taskRef, window.tasks);
+  window.saveToCloud = () => set(taskRef, window.tasks);
 
-  window.setSort = (col) => {
-    if (window.sortCol === col) window.sortDir = window.sortDir === 'asc' ? 'desc' : 'asc';
-    else { window.sortCol = col; window.sortDir = 'asc'; }
-    renderTasks();
-  };
+  window.setSort = (col) => {
+    if (window.sortCol === col) window.sortDir = window.sortDir === 'asc' ? 'desc' : 'asc';
+    else { window.sortCol = col; window.sortDir = 'asc'; }
+    renderTasks();
+  };
 
-  window.addTask = function() {
-    const title = document.getElementById('taskTitle').value;
-    if (!title) return alert("Enter task!");
-    window.tasks.push({
-        id: Date.now(), title: title,
-        priority: document.getElementById('taskPriority').value,
-        assignee: document.getElementById('assignee').value || '---',
-        dueDate: document.getElementById('dueDate').value || '',
-        status: 'Not Started Yet', progress: 0
-    });
-    saveToCloud();
-    document.getElementById('taskTitle').value = '';
-    document.getElementById('assignee').value = '';
-  };
+  window.addTask = function() {
+    const title = document.getElementById('taskTitle').value;
+    if (!title) return alert("Enter task!");
+    window.tasks.push({
+        id: Date.now(), title: title,
+        priority: document.getElementById('taskPriority').value,
+        assignee: document.getElementById('assignee').value || '---',
+        dueDate: document.getElementById('dueDate').value || '',
+        finishedDate: '',
+        status: 'Not Started Yet', progress: 0
+    });
+    saveToCloud();
+    document.getElementById('taskTitle').value = '';
+    document.getElementById('assignee').value = '';
+  };
 
-  window.updateField = (id, field, value) => {
-    const t = window.tasks.find(t => t.id === id);
-    if(t && t[field] !== value) {
-        t[field] = value;
-        saveToCloud();
-    }
-  };
+  window.updateField = (id, field, value) => {
+    const t = window.tasks.find(t => t.id === id);
+    if(t && t[field] !== value) {
+        t[field] = value;
+        saveToCloud();
+    }
+  };
 
-  window.renderTasks = function() {
-    const tbody = document.getElementById('taskBody');
-    const query = document.getElementById('globalSearch').value.toLowerCase();
-    const today = new Date().toISOString().split('T')[0];
-    tbody.innerHTML = '';
-    const scores = { "Not Started Yet": 1, "Pending/In Progress": 2, "Done/Completed": 3 };
+  window.renderTasks = function() {
+    const tbody = document.getElementById('taskBody');
+    const query = document.getElementById('globalSearch').value.toLowerCase();
+    const today = new Date().toISOString().split('T')[0];
+    tbody.innerHTML = '';
+    const scores = { "Not Started Yet": 1, "Pending/In Progress": 2, "Done/Completed": 3 };
 
-    const sorted = [...window.tasks].sort((a, b) => {
-        let valA, valB;
-        if (window.sortCol === 'status') { valA = scores[a.status] || 0; valB = scores[b.status] || 0; }
-        else if (window.sortCol === 'priority') { valA = a.priority; valB = b.priority; }
-        else if (window.sortCol === 'progress') { valA = parseInt(a.progress); valB = parseInt(b.progress); }
-        else { valA = (a[window.sortCol] || "").toLowerCase(); valB = (b[window.sortCol] || "").toLowerCase(); }
-        if (valA < valB) return window.sortDir === 'asc' ? -1 : 1;
-        if (valA > valB) return window.sortDir === 'asc' ? 1 : -1;
-        return 0;
-    });
+    const sorted = [...window.tasks].sort((a, b) => {
+        let valA, valB;
+        if (window.sortCol === 'status') { valA = scores[a.status] || 0; valB = scores[b.status] || 0; }
+        else if (window.sortCol === 'priority') { valA = a.priority; valB = b.priority; }
+        else if (window.sortCol === 'progress') { valA = parseInt(a.progress); valB = parseInt(b.progress); }
+        else { valA = (a[window.sortCol] || "").toLowerCase(); valB = (b[window.sortCol] || "").toLowerCase(); }
+        if (valA < valB) return window.sortDir === 'asc' ? -1 : 1;
+        if (valA > valB) return window.sortDir === 'asc' ? 1 : -1;
+        return 0;
+    });
 
-    sorted.forEach(task => {
-        if (task.title.toLowerCase().includes(query) || (task.assignee && task.assignee.toLowerCase().includes(query))) {
-            const isDone = task.status === 'Done/Completed';
-            const row = document.createElement('tr');
-            row.className = isDone ? 'row-done' : (task.status === 'Pending/In Progress' ? 'row-pending' : '');
-            row.innerHTML = `
-                <td><div contenteditable="true" class="editable" onblur="updateField(${task.id}, 'title', this.innerText)">${task.title}</div></td>
-                <td>
-                    <select onchange="updateField(${task.id}, 'priority', this.value)" class="prio-select">
-                        <option value="3-High" ${task.priority === '3-High' ? 'selected' : ''}>High</option>
-                        <option value="2-Medium" ${task.priority === '2-Medium' ? 'selected' : ''}>Medium</option>
-                        <option value="1-Low" ${task.priority === '1-Low' ? 'selected' : ''}>Low</option>
-                    </select>
-                </td>
-                <td><div contenteditable="true" class="editable" onblur="updateField(${task.id}, 'assignee', this.innerText)">${task.assignee}</div></td>
-                <td><input type="date" value="${task.dueDate}" onchange="updateField(${task.id}, 'dueDate', this.value)" style="border:none; background:transparent; font-size:0.85rem; width:105px; color:${task.dueDate < today && !isDone ? 'var(--danger)' : 'inherit'}; font-weight:${task.dueDate < today && !isDone ? 'bold' : 'normal'}"></td>
-                <td>
-                    <div class="progress-bar"><div class="progress-fill" style="width:${task.progress}%; background:var(--accent)"></div></div>
-                    <input type="range" value="${task.progress}" onchange="updateProgress(${task.id}, this.value)" style="width:100%" class="no-print">
-                </td>
-                <td>
-                    <select onchange="updateStatus(${task.id}, this.value)" class="status-select">
-                        <option ${task.status === 'Not Started Yet' ? 'selected' : ''}>Not Started Yet</option>
-                        <option ${task.status === 'Pending/In Progress' ? 'selected' : ''}>Pending/In Progress</option>
-                        <option ${task.status === 'Done/Completed' ? 'selected' : ''}>Done/Completed</option>
-                    </select>
-                </td>
-                <td><button onclick="deleteTask(${task.id})" style="border:none; background:none; cursor:pointer; color:#ccc">✕</button></td>
-            `;
-            tbody.appendChild(row);
-        }
-    });
-  };
+    sorted.forEach(task => {
+        if (task.title.toLowerCase().includes(query) || (task.assignee && task.assignee.toLowerCase().includes(query))) {
+            const isDone = task.status === 'Done/Completed';
+            const row = document.createElement('tr');
+            row.className = isDone ? 'row-done' : (task.status === 'Pending/In Progress' ? 'row-pending' : '');
+            row.innerHTML = `
+                <td><div contenteditable="true" class="editable" onblur="updateField(${task.id}, 'title', this.innerText)">${task.title}</div></td>
+                <td>
+                    <select onchange="updateField(${task.id}, 'priority', this.value)" class="prio-select">
+                        <option value="3-High" ${task.priority === '3-High' ? 'selected' : ''}>High</option>
+                        <option value="2-Medium" ${task.priority === '2-Medium' ? 'selected' : ''}>Medium</option>
+                        <option value="1-Low" ${task.priority === '1-Low' ? 'selected' : ''}>Low</option>
+                    </select>
+                </td>
+                <td><div contenteditable="true" class="editable" onblur="updateField(${task.id}, 'assignee', this.innerText)">${task.assignee}</div></td>
+                <td><input type="date" value="${task.dueDate}" onchange="updateField(${task.id}, 'dueDate', this.value)" style="border:none; background:transparent; font-size:0.85rem; width:105px; color:${task.dueDate < today && !isDone ? 'var(--danger)' : 'inherit'}; font-weight:${task.dueDate < today && !isDone ? 'bold' : 'normal'}"></td>
+                <td><input type="date" value="${task.finishedDate || ''}" onchange="updateField(${task.id}, 'finishedDate', this.value)" style="border:none; background:transparent; font-size:0.85rem; width:105px;"></td>
+                <td>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${task.progress}%; background:var(--accent)"></div></div>
+                    <input type="range" value="${task.progress}" onchange="updateProgress(${task.id}, this.value)" style="width:100%" class="no-print">
+                </td>
+                <td>
+                    <select onchange="updateStatus(${task.id}, this.value)" class="status-select">
+                        <option ${task.status === 'Not Started Yet' ? 'selected' : ''}>Not Started Yet</option>
+                        <option ${task.status === 'Pending/In Progress' ? 'selected' : ''}>Pending/In Progress</option>
+                        <option ${task.status === 'Done/Completed' ? 'selected' : ''}>Done/Completed</option>
+                    </select>
+                </td>
+                <td><button onclick="deleteTask(${task.id})" style="border:none; background:none; cursor:pointer; color:#ccc">✕</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+    });
+  };
 
-  window.updateStatus = (id, val) => {
-    const t = window.tasks.find(t => t.id === id);
-    if(t) { t.status = val; if(val === 'Done/Completed') t.progress = 100; saveToCloud(); }
-  };
+  window.updateStatus = (id, val) => {
+    const t = window.tasks.find(t => t.id === id);
+    if(t) { 
+        t.status = val; 
+        if(val === 'Done/Completed') {
+            t.progress = 100;
+            // Only set finished date if it's currently empty
+            if(!t.finishedDate) t.finishedDate = new Date().toISOString().split('T')[0];
+        } else {
+            t.finishedDate = ''; // Clear if moved back to pending
+        }
+        saveToCloud(); 
+    }
+  };
 
-  window.updateProgress = (id, val) => {
-    const t = window.tasks.find(t => t.id === id);
-    if(t) { t.progress = val; if(val == 100) t.status = 'Done/Completed'; else if (val > 0) t.status = 'Pending/In Progress'; saveToCloud(); }
-  };
+  window.updateProgress = (id, val) => {
+    const t = window.tasks.find(t => t.id === id);
+    if(t) { 
+        t.progress = val; 
+        if(val == 100) {
+            t.status = 'Done/Completed';
+            if(!t.finishedDate) t.finishedDate = new Date().toISOString().split('T')[0];
+        } else if (val > 0) {
+            t.status = 'Pending/In Progress';
+            t.finishedDate = '';
+        } else {
+            t.status = 'Not Started Yet';
+            t.finishedDate = '';
+        }
+        saveToCloud(); 
+    }
+  };
 
-  window.deleteTask = (id) => { if(confirm('Remove task?')) { window.tasks = window.tasks.filter(t => t.id !== id); saveToCloud(); } };
+  window.deleteTask = (id) => { if(confirm('Remove task?')) { window.tasks = window.tasks.filter(t => t.id !== id); saveToCloud(); } };
 
-  window.updateStats = function() {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('statTotal').innerText = window.tasks.length;
-    document.getElementById('statDone').innerText = window.tasks.filter(t => t.status === 'Done/Completed').length;
-    document.getElementById('statPending').innerText = window.tasks.filter(t => t.status === 'Pending/In Progress').length;
-    document.getElementById('statOverdue').innerText = window.tasks.filter(t => t.dueDate && t.dueDate < today && t.status !== 'Done/Completed').length;
-  };
+  window.updateStats = function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('statTotal').innerText = window.tasks.length;
+    document.getElementById('statDone').innerText = window.tasks.filter(t => t.status === 'Done/Completed').length;
+    document.getElementById('statPending').innerText = window.tasks.filter(t => t.status === 'Pending/In Progress').length;
+    document.getElementById('statOverdue').innerText = window.tasks.filter(t => t.dueDate && t.dueDate < today && t.status !== 'Done/Completed').length;
+  };
 
-  window.exportToCSV = function() {
-    let csv = '\uFEFFTitle,Priority,Assignee,Deadline,Status\n';
-    window.tasks.forEach(t => csv += `"${t.title}","${t.priority}","${t.assignee}","${t.dueDate}","${t.status}"\n`);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = 'Tasks.csv'; a.click();
-  };
+  window.exportToCSV = function() {
+    let csv = '\uFEFFTitle,Priority,Assignee,Deadline,FinishedDate,Status\n';
+    window.tasks.forEach(t => csv += `"${t.title}","${t.priority}","${t.assignee}","${t.dueDate}","${t.finishedDate}","${t.status}"\n`);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'Tasks_Report.csv'; a.click();
+  };
 </script>
 </body>
-</html> add finished date the printlist function
+</html>
