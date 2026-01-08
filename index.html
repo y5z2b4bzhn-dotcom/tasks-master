@@ -271,4 +271,8 @@
     window.tasks.forEach(t => csv += `"${t.title}","${t.priority}","${t.assignee}","${t.dueDate}","${t.status}"\n`);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = 'Tasks.csv'; a
+    a.download = 'Tasks.csv'; a.click();
+  };
+</script>
+</body>
+</html>
