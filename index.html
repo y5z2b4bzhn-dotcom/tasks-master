@@ -147,3 +147,190 @@
   };
 
   const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const taskRef = ref(db, 'tasks/');
+
+  window.tasks = [];
+  window.sortCol = 'status';
+  window.sortDir = 'asc';
+
+  // --- PRINT FUNCTION ---
+  window.triggerPrint = function() {
+    window.print();
+  };
+
+  // --- EXCEL EXPORT FUNCTION ---
+  window.exportToExcel = function() {
+    if (window.tasks.length === 0) return alert("No data to export!");
+    
+    // Create CSV content with BOM for Excel UTF-8 support
+    let csvContent = "\uFEFF"; 
+    csvContent += "Task Description,Priority,Assignee,Deadline,Finished Date,Status\n";
+
+    window.tasks.forEach(task => {
+        let row = [
+            `"${(task.title || "").replace(/"/g, '""')}"`,
+            `"${(task.priority || "").split('-')[1] || ""}"`,
+            `"${(task.assignee || "").replace(/"/g, '""')}"`,
+            `"${task.dueDate || ""}"`,
+            `"${task.finishedDate || ""}"`,
+            `"${task.status || ""}"`
+        ];
+        csvContent += row.join(",") + "\n";
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Kaysone_Tasks_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  function updateVisitDate() {
+      const dateEl = document.getElementById('visitDate');
+      if (dateEl) {
+          const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+          dateEl.innerText = new Date().toLocaleDateString('en-US', options);
+      }
+  }
+  updateVisitDate();
+
+  onValue(taskRef, (snapshot) => {
+    const data = snapshot.val();
+    window.tasks = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+    renderTasks();
+    updateStats();
+  });
+
+  window.saveToCloud = () => set(taskRef, window.tasks);
+
+  window.setSort = (col) => {
+    if (window.sortCol === col) window.sortDir = window.sortDir === 'asc' ? 'desc' : 'asc';
+    else { window.sortCol = col; window.sortDir = 'asc'; }
+    renderTasks();
+  };
+
+  window.addTask = function() {
+    const title = document.getElementById('taskTitle').value;
+    if (!title) return alert("Enter task name!");
+    window.tasks.push({
+        id: Date.now(), title: title,
+        priority: document.getElementById('taskPriority').value,
+        assignee: document.getElementById('assignee').value || '---',
+        dueDate: document.getElementById('dueDate').value || '',
+        finishedDate: '',
+        status: 'Not Started Yet', progress: 0
+    });
+    saveToCloud();
+    document.getElementById('taskTitle').value = '';
+    document.getElementById('assignee').value = '';
+  };
+
+  window.updateField = (id, field, value) => {
+    const t = window.tasks.find(t => t.id === id);
+    if(t && t[field] !== value) {
+        t[field] = value;
+        saveToCloud();
+    }
+  };
+
+  window.renderTasks = function() {
+    const tbody = document.getElementById('taskBody');
+    const query = document.getElementById('globalSearch').value.toLowerCase();
+    const today = new Date().toISOString().split('T')[0];
+    tbody.innerHTML = '';
+    const scores = { "Not Started Yet": 1, "Pending/In Progress": 2, "Done/Completed": 3 };
+
+    const sorted = [...window.tasks].sort((a, b) => {
+        let valA, valB;
+        if (window.sortCol === 'status') { valA = scores[a.status] || 0; valB = scores[b.status] || 0; }
+        else if (window.sortCol === 'priority') { valA = a.priority; valB = b.priority; }
+        else if (window.sortCol === 'progress') { valA = parseInt(a.progress); valB = parseInt(b.progress); }
+        else { valA = (a[window.sortCol] || "").toLowerCase(); valB = (b[window.sortCol] || "").toLowerCase(); }
+        if (valA < valB) return window.sortDir === 'asc' ? -1 : 1;
+        if (valA > valB) return window.sortDir === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    sorted.forEach(task => {
+        if (task.title.toLowerCase().includes(query) || (task.assignee && task.assignee.toLowerCase().includes(query))) {
+            const isDone = task.status === 'Done/Completed';
+            const row = document.createElement('tr');
+            row.className = isDone ? 'row-done' : (task.status === 'Pending/In Progress' ? 'row-pending' : '');
+            row.innerHTML = `
+                <td><div contenteditable="true" class="editable" onblur="updateField(${task.id}, 'title', this.innerText)">${task.title}</div></td>
+                <td>
+                    <select onchange="updateField(${task.id}, 'priority', this.value)" class="prio-select">
+                        <option value="3-High" ${task.priority === '3-High' ? 'selected' : ''}>High</option>
+                        <option value="2-Medium" ${task.priority === '2-Medium' ? 'selected' : ''}>Medium</option>
+                        <option value="1-Low" ${task.priority === '1-Low' ? 'selected' : ''}>Low</option>
+                    </select>
+                </td>
+                <td><div contenteditable="true" class="editable" onblur="updateField(${task.id}, 'assignee', this.innerText)">${task.assignee}</div></td>
+                <td><input type="date" value="${task.dueDate}" onchange="updateField(${task.id}, 'dueDate', this.value)" style="border:none; background:transparent; font-size:0.85rem; width:105px; color:${task.dueDate < today && !isDone ? 'var(--danger)' : 'inherit'}; font-weight:${task.dueDate < today && !isDone ? 'bold' : 'normal'}"></td>
+                <td><input type="date" value="${task.finishedDate || ''}" onchange="updateField(${task.id}, 'finishedDate', this.value)" style="border:none; background:transparent; font-size:0.85rem; width:105px;"></td>
+                <td>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${task.progress}%; background:var(--accent)"></div></div>
+                    <input type="range" value="${task.progress}" onchange="updateProgress(${task.id}, this.value)" style="width:100%" class="no-print">
+                </td>
+                <td>
+                    <select onchange="updateStatus(${task.id}, this.value)" class="status-select">
+                        <option ${task.status === 'Not Started Yet' ? 'selected' : ''}>Not Started Yet</option>
+                        <option ${task.status === 'Pending/In Progress' ? 'selected' : ''}>Pending/In Progress</option>
+                        <option ${task.status === 'Done/Completed' ? 'selected' : ''}>Done/Completed</option>
+                    </select>
+                </td>
+                <td class="no-print"><button onclick="deleteTask(${task.id})" style="border:none; background:none; cursor:pointer; color:#ccc">✕</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+    });
+  };
+
+  window.updateStatus = (id, val) => {
+    const t = window.tasks.find(t => t.id === id);
+    if(t) { 
+        t.status = val; 
+        if(val === 'Done/Completed') {
+            t.progress = 100;
+            if(!t.finishedDate) t.finishedDate = new Date().toISOString().split('T')[0];
+        } else {
+            t.finishedDate = '';
+        }
+        saveToCloud(); 
+    }
+  };
+
+  window.updateProgress = (id, val) => {
+    const t = window.tasks.find(t => t.id === id);
+    if(t) { 
+        t.progress = val; 
+        if(val == 100) {
+            t.status = 'Done/Completed';
+            if(!t.finishedDate) t.finishedDate = new Date().toISOString().split('T')[0];
+        } else if (val > 0) {
+            t.status = 'Pending/In Progress';
+            t.finishedDate = '';
+        } else {
+            t.status = 'Not Started Yet';
+            t.finishedDate = '';
+        }
+        saveToCloud(); 
+    }
+  };
+
+  window.deleteTask = (id) => { if(confirm('Remove task?')) { window.tasks = window.tasks.filter(t => t.id !== id); saveToCloud(); } };
+
+  window.updateStats = function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('statTotal').innerText = window.tasks.length;
+    document.getElementById('statDone').innerText = window.tasks.filter(t => t.status === 'Done/Completed').length;
+    document.getElementById('statPending').innerText = window.tasks.filter(t => t.status === 'Pending/In Progress').length;
+    document.getElementById('statOverdue').innerText = window.tasks.filter(t => t.dueDate && t.dueDate < today && t.status !== 'Done/Completed').length;
+  };
+</script>
+</body>
+</html>
