@@ -16,6 +16,8 @@
             background-color: var(--bg); color: var(--text-dark); margin: 0; padding: 15px; 
         }
         .container { max-width: 1400px; margin: 0 auto; }
+        
+        /* Header Styling */
         header {
             position: relative; display: flex; justify-content: space-between; align-items: center;
             background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Great_Wave_off_Kanagawa2.jpg/1280px-Great_Wave_off_Kanagawa2.jpg');
@@ -26,48 +28,53 @@
         .header-titles { position: relative; z-index: 2; }
         .header-titles h1 { margin: 0; font-size: 1.8rem; font-weight: 700; }
         .header-titles h2 { margin: 2px 0; font-size: 1.2rem; font-style: italic; }
-        
+
+        /* Print Helper Button */
+        .print-helper {
+            position: fixed; bottom: 20px; right: 20px; z-index: 1000;
+            background: var(--primary); color: white; border: none; padding: 12px 20px;
+            border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-weight: bold; display: flex; align-items: center; gap: 8px;
+        }
+        .print-helper:hover { background: #000; }
+
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .stat-card { background: var(--card-bg); padding: 10px; border-radius: 12px; border-bottom: 3px solid var(--accent); }
 
-        .search-bar { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 15px; }
+        .search-bar { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 15px; }
 
         .form-section { background: var(--card-bg); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
         .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
-        
-        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .btn-main { background: var(--accent); color: white; }
+        label { font-size: 0.75rem; font-weight: bold; color: #666; }
 
         .table-container { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
         th { background: #f8f9fa; padding: 12px 10px; text-align: left; font-size: 0.75rem; border-bottom: 2px solid #eee; }
         td { padding: 10px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
         
-        .editable { padding: 4px; border-radius: 4px; }
+        .editable { padding: 4px; border-radius: 4px; transition: 0.2s; }
+        .editable:hover { background: #f0f7ff; }
         .row-done { background-color: var(--success-light) !important; }
-        
-        /* PRINT STYLES */
+
+        /* PRINT LOGIC */
         @media print {
             @page { size: landscape; margin: 1cm; }
+            .print-helper, .form-section, .search-bar, .no-print, .action-col { display: none !important; }
             body { background: white; padding: 0; }
-            .no-print, .header-actions, .form-section, .search-bar, input[type="range"], .action-col { 
-                display: none !important; 
-            }
-            header { 
-                background: none !important; color: black !important; 
-                border-bottom: 2px solid #333; padding: 0 0 10px 0; margin-bottom: 20px;
-            }
+            header { background: none !important; color: black !important; border-bottom: 2px solid #333; }
             header::before { display: none; }
-            .container { max-width: 100%; }
-            .table-container { box-shadow: none; overflow: visible; }
-            table { min-width: 100%; table-layout: fixed; }
-            th, td { border: 1px solid #ccc; font-size: 0.8rem; word-wrap: break-word; }
-            .stat-card { border: 1px solid #ccc; }
-            select { border: none; appearance: none; -webkit-appearance: none; color: black !important; }
+            .table-container { box-shadow: none; border: 1px solid #eee; }
+            table { min-width: 100%; }
+            th, td { border: 1px solid #ddd; color: black !important; }
+            select { border: none; -webkit-appearance: none; appearance: none; background: transparent; }
         }
     </style>
 </head>
 <body>
+
+<button class="print-helper no-print" onclick="window.print()">
+    <span>🖨️ Click to Print Report</span>
+</button>
 
 <div class="container">
     <header>
@@ -75,10 +82,6 @@
             <h1>ລະບົບຈັດການວຽກ ໄກສອນ</h1>
             <h2>Kaysone's Task Management</h2>
             <p id="visitDate">---</p>
-        </div>
-        <div class="header-actions no-print">
-            <button class="btn" style="background:var(--primary); color:white" onclick="window.print()">🖨️ Print List</button>
-            <button class="btn" style="background:var(--success); color:white" onclick="exportToCSV()">📊 Export Excel</button>
         </div>
     </header>
 
@@ -89,7 +92,7 @@
         <div class="stat-card" style="border-bottom-color: var(--danger)"><h3><span id="statOverdue">0</span></h3><p>Overdue</p></div>
     </div>
 
-    <input type="text" id="globalSearch" class="search-bar no-print" placeholder="🔍 Search tasks..." onkeyup="renderTasks()">
+    <input type="text" id="globalSearch" class="search-bar no-print" placeholder="🔍 Filter tasks for printing..." onkeyup="renderTasks()">
 
     <div class="form-section no-print">
         <div class="grid-inputs">
@@ -103,7 +106,9 @@
             </div>
             <div><label>Assignee</label><input type="text" id="assignee"></div>
             <div><label>Deadline</label><input type="date" id="dueDate"></div>
-            <div style="display: flex; align-items: flex-end;"><button class="btn btn-main" onclick="addTask()" style="width:100%">+ ADD</button></div>
+            <div style="display: flex; align-items: flex-end;">
+                <button onclick="addTask()" style="width:100%; padding: 10px; background:var(--accent); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">+ ADD</button>
+            </div>
         </div>
     </div>
 
@@ -111,13 +116,13 @@
         <table>
             <thead>
                 <tr>
-                    <th style="width: 25%">Description</th>
+                    <th style="width: 25%">Task Description</th>
                     <th style="width: 10%">Priority</th>
                     <th style="width: 15%">Assignee</th>
                     <th style="width: 12%">Deadline</th>
                     <th style="width: 12%">Finished Date</th>
-                    <th style="width: 12%">Status</th>
-                    <th class="action-col" style="width: 5%">Action</th>
+                    <th style="width: 15%">Status</th>
+                    <th class="action-col no-print" style="width: 5%">Del</th>
                 </tr>
             </thead>
             <tbody id="taskBody"></tbody>
@@ -156,7 +161,7 @@
 
   window.addTask = function() {
     const title = document.getElementById('taskTitle').value;
-    if (!title) return alert("Enter task!");
+    if (!title) return alert("Please enter task details");
     window.tasks.push({
         id: Date.now(), 
         title: title,
@@ -164,8 +169,7 @@
         assignee: document.getElementById('assignee').value || '---',
         dueDate: document.getElementById('dueDate').value || '',
         finishedDate: '',
-        status: 'Not Started Yet', 
-        progress: 0
+        status: 'Not Started Yet'
     });
     saveToCloud();
     document.getElementById('taskTitle').value = '';
@@ -182,7 +186,6 @@
     if(t) { 
         t.status = val; 
         t.finishedDate = (val === 'Done/Completed') ? new Date().toISOString().split('T')[0] : '';
-        t.progress = (val === 'Done/Completed') ? 100 : t.progress;
         saveToCloud(); 
     }
   };
@@ -190,10 +193,11 @@
   window.renderTasks = function() {
     const tbody = document.getElementById('taskBody');
     const query = document.getElementById('globalSearch').value.toLowerCase();
+    const today = new Date().toISOString().split('T')[0];
     tbody.innerHTML = '';
 
     window.tasks.forEach(task => {
-        if (task.title.toLowerCase().includes(query)) {
+        if (task.title.toLowerCase().includes(query) || task.assignee.toLowerCase().includes(query)) {
             const isDone = task.status === 'Done/Completed';
             const row = document.createElement('tr');
             if(isDone) row.classList.add('row-done');
@@ -202,7 +206,7 @@
                 <td><div contenteditable="true" class="editable" onblur="updateField(${task.id}, 'title', this.innerText)">${task.title}</div></td>
                 <td>${task.priority}</td>
                 <td><div contenteditable="true" class="editable" onblur="updateField(${task.id}, 'assignee', this.innerText)">${task.assignee}</div></td>
-                <td>${task.dueDate || '---'}</td>
+                <td style="color:${task.dueDate < today && !isDone ? 'red' : 'inherit'}">${task.dueDate || '---'}</td>
                 <td style="color:var(--success); font-weight:bold;">${task.finishedDate || '---'}</td>
                 <td>
                     <select onchange="updateStatus(${task.id}, this.value)" class="no-print">
@@ -212,7 +216,7 @@
                     </select>
                     <span class="print-only" style="display:none">${task.status}</span>
                 </td>
-                <td class="action-col"><button onclick="deleteTask(${task.id})" style="color:red; border:none; background:none; cursor:pointer">✕</button></td>
+                <td class="action-col no-print"><button onclick="deleteTask(${task.id})" style="color:#ccc; border:none; background:none; cursor:pointer">✕</button></td>
             `;
             tbody.appendChild(row);
         }
@@ -222,17 +226,11 @@
   window.deleteTask = (id) => { if(confirm('Remove?')) { window.tasks = window.tasks.filter(t => t.id !== id); saveToCloud(); } };
 
   window.updateStats = function() {
+    const today = new Date().toISOString().split('T')[0];
     document.getElementById('statTotal').innerText = window.tasks.length;
     document.getElementById('statDone').innerText = window.tasks.filter(t => t.status === 'Done/Completed').length;
     document.getElementById('statPending').innerText = window.tasks.filter(t => t.status === 'Pending/In Progress').length;
-  };
-
-  window.exportToCSV = function() {
-    let csv = '\uFEFFTitle,Priority,Assignee,Deadline,Finished Date,Status\n';
-    window.tasks.forEach(t => csv += `"${t.title}","${t.priority}","${t.assignee}","${t.dueDate}","${t.finishedDate}","${t.status}"\n`);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = 'Tasks.csv'; a.click();
+    document.getElementById('statOverdue').innerText = window.tasks.filter(t => t.dueDate && t.dueDate < today && t.status !== 'Done/Completed').length;
   };
 
   document.getElementById('visitDate').innerText = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
