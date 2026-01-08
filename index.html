@@ -50,9 +50,11 @@
         
         .editable { cursor: text; padding: 2px 4px; border-radius: 4px; transition: 0.2s; border: 1px solid transparent; }
         .editable:hover { background: #f0f7ff; border: 1px dashed var(--accent); }
+        .editable:focus { background: #fff; border: 1px solid var(--accent); outline: none; }
 
         .row-done { background-color: var(--success-light); }
         .row-pending { background-color: var(--warning-light); }
+        .badge { padding: 2px 6px; border-radius: 5px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
         .prio-High { background: #ff7675; color: white; }
         .prio-Medium { background: #ffeaa7; color: #d6a01d; }
         .prio-Low { background: #55efc4; color: #00b894; }
@@ -60,34 +62,11 @@
         .progress-bar { height: 5px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 4px; }
         .progress-fill { height: 100%; transition: width 0.4s ease; }
         .status-select, .prio-select { background: transparent; border: 1px solid #ddd; padding: 2px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; font-family: 'Times New Roman', serif; }
-
-        /* --- FLOATING PRINT BUTTON --- */
-        .print-btn {
-            position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px;
-            background: var(--primary); color: white; border-radius: 50%; border: none;
-            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex;
-            align-items: center; justify-content: center; font-size: 20px; z-index: 1000;
-        }
-        .print-btn:hover { background: #000; }
-
-        /* --- PRINT VIEW LOGIC --- */
-        @media print {
-            .print-btn, .form-section, .search-bar, th:last-child, td:last-child, input[type="range"] {
-                display: none !important;
-            }
-            body { background: white; padding: 0; }
-            header { background-image: none !important; color: black; border-bottom: 2px solid #000; }
-            header::before { display: none; }
-            .container { max-width: 100%; }
-            .table-container { box-shadow: none; border: 1px solid #eee; }
-            table { width: 100%; border: 1px solid #000; }
-            th, td { border: 1px solid #ddd; }
-        }
+        
+        @media print { .no-print { display: none; } header { padding: 1rem; background-image: none !important; color: black; } }
     </style>
 </head>
 <body>
-
-<button class="print-btn" onclick="window.print()" title="Print Page">🖨️</button>
 
 <div class="container">
     <header>
@@ -95,6 +74,10 @@
             <h1>ລະບົບຈັດການວຽກ ໄກສອນ</h1>
             <h2>Kaysone's Task Management</h2>
             <p id="visitDate">---</p>
+        </div>
+        <div class="header-actions no-print">
+            <button class="btn" style="background:rgba(255,255,255,0.3); color:white" onclick="window.print()">Print</button>
+            <button class="btn" style="background:var(--success); color:white" onclick="exportToCSV()">Excel</button>
         </div>
     </header>
 
@@ -105,9 +88,9 @@
         <div class="stat-card" style="border-bottom-color: var(--danger)"><h3><span id="statOverdue">0</span></h3><p>Late</p></div>
     </div>
 
-    <input type="text" id="globalSearch" class="search-bar" placeholder="🔍 Search tasks..." onkeyup="renderTasks()">
+    <input type="text" id="globalSearch" class="search-bar no-print" placeholder="🔍 Search tasks..." onkeyup="renderTasks()">
 
-    <div class="form-section">
+    <div class="form-section no-print">
         <div class="grid-inputs">
             <div><label>Description</label><input type="text" id="taskTitle"></div>
             <div><label>Priority</label>
@@ -190,13 +173,14 @@
 
   window.addTask = function() {
     const title = document.getElementById('taskTitle').value;
-    if (!title) return alert("Enter task name!");
+    if (!title) return alert("Enter task!");
     window.tasks.push({
         id: Date.now(), title: title,
         priority: document.getElementById('taskPriority').value,
         assignee: document.getElementById('assignee').value || '---',
         dueDate: document.getElementById('dueDate').value || '',
-        finishedDate: '', status: 'Not Started Yet', progress: 0
+        finishedDate: '',
+        status: 'Not Started Yet', progress: 0
     });
     saveToCloud();
     document.getElementById('taskTitle').value = '';
@@ -205,12 +189,15 @@
 
   window.updateField = (id, field, value) => {
     const t = window.tasks.find(t => t.id === id);
-    if(t && t[field] !== value) { t[field] = value; saveToCloud(); }
+    if(t && t[field] !== value) {
+        t[field] = value;
+        saveToCloud();
+    }
   };
 
   window.renderTasks = function() {
     const tbody = document.getElementById('taskBody');
-    const query = (document.getElementById('globalSearch').value || '').toLowerCase();
+    const query = document.getElementById('globalSearch').value.toLowerCase();
     const today = new Date().toISOString().split('T')[0];
     tbody.innerHTML = '';
     const scores = { "Not Started Yet": 1, "Pending/In Progress": 2, "Done/Completed": 3 };
@@ -232,29 +219,29 @@
             const row = document.createElement('tr');
             row.className = isDone ? 'row-done' : (task.status === 'Pending/In Progress' ? 'row-pending' : '');
             row.innerHTML = `
-                <td><div contenteditable="true" class="editable" onblur="window.updateField(${task.id}, 'title', this.innerText)">${task.title}</div></td>
+                <td><div contenteditable="true" class="editable" onblur="updateField(${task.id}, 'title', this.innerText)">${task.title}</div></td>
                 <td>
-                    <select onchange="window.updateField(${task.id}, 'priority', this.value)" class="prio-select">
+                    <select onchange="updateField(${task.id}, 'priority', this.value)" class="prio-select">
                         <option value="3-High" ${task.priority === '3-High' ? 'selected' : ''}>High</option>
                         <option value="2-Medium" ${task.priority === '2-Medium' ? 'selected' : ''}>Medium</option>
                         <option value="1-Low" ${task.priority === '1-Low' ? 'selected' : ''}>Low</option>
                     </select>
                 </td>
-                <td><div contenteditable="true" class="editable" onblur="window.updateField(${task.id}, 'assignee', this.innerText)">${task.assignee}</div></td>
-                <td><input type="date" value="${task.dueDate}" onchange="window.updateField(${task.id}, 'dueDate', this.value)" style="border:none; background:transparent; font-size:0.85rem; width:105px; color:${task.dueDate < today && !isDone ? 'var(--danger)' : 'inherit'}; font-weight:${task.dueDate < today && !isDone ? 'bold' : 'normal'}"></td>
-                <td><input type="date" value="${task.finishedDate || ''}" onchange="window.updateField(${task.id}, 'finishedDate', this.value)" style="border:none; background:transparent; font-size:0.85rem; width:105px;"></td>
+                <td><div contenteditable="true" class="editable" onblur="updateField(${task.id}, 'assignee', this.innerText)">${task.assignee}</div></td>
+                <td><input type="date" value="${task.dueDate}" onchange="updateField(${task.id}, 'dueDate', this.value)" style="border:none; background:transparent; font-size:0.85rem; width:105px; color:${task.dueDate < today && !isDone ? 'var(--danger)' : 'inherit'}; font-weight:${task.dueDate < today && !isDone ? 'bold' : 'normal'}"></td>
+                <td><input type="date" value="${task.finishedDate || ''}" onchange="updateField(${task.id}, 'finishedDate', this.value)" style="border:none; background:transparent; font-size:0.85rem; width:105px;"></td>
                 <td>
                     <div class="progress-bar"><div class="progress-fill" style="width:${task.progress}%; background:var(--accent)"></div></div>
-                    <input type="range" value="${task.progress}" onchange="window.updateProgress(${task.id}, this.value)" style="width:100%">
+                    <input type="range" value="${task.progress}" onchange="updateProgress(${task.id}, this.value)" style="width:100%" class="no-print">
                 </td>
                 <td>
-                    <select onchange="window.updateStatus(${task.id}, this.value)" class="status-select">
+                    <select onchange="updateStatus(${task.id}, this.value)" class="status-select">
                         <option ${task.status === 'Not Started Yet' ? 'selected' : ''}>Not Started Yet</option>
                         <option ${task.status === 'Pending/In Progress' ? 'selected' : ''}>Pending/In Progress</option>
                         <option ${task.status === 'Done/Completed' ? 'selected' : ''}>Done/Completed</option>
                     </select>
                 </td>
-                <td><button onclick="window.deleteTask(${task.id})" style="border:none; background:none; cursor:pointer; color:#ccc">✕</button></td>
+                <td><button onclick="deleteTask(${task.id})" style="border:none; background:none; cursor:pointer; color:#ccc">✕</button></td>
             `;
             tbody.appendChild(row);
         }
@@ -267,9 +254,10 @@
         t.status = val; 
         if(val === 'Done/Completed') {
             t.progress = 100;
+            // Only set finished date if it's currently empty
             if(!t.finishedDate) t.finishedDate = new Date().toISOString().split('T')[0];
         } else {
-            t.finishedDate = '';
+            t.finishedDate = ''; // Clear if moved back to pending
         }
         saveToCloud(); 
     }
@@ -301,6 +289,14 @@
     document.getElementById('statDone').innerText = window.tasks.filter(t => t.status === 'Done/Completed').length;
     document.getElementById('statPending').innerText = window.tasks.filter(t => t.status === 'Pending/In Progress').length;
     document.getElementById('statOverdue').innerText = window.tasks.filter(t => t.dueDate && t.dueDate < today && t.status !== 'Done/Completed').length;
+  };
+
+  window.exportToCSV = function() {
+    let csv = '\uFEFFTitle,Priority,Assignee,Deadline,FinishedDate,Status\n';
+    window.tasks.forEach(t => csv += `"${t.title}","${t.priority}","${t.assignee}","${t.dueDate}","${t.finishedDate}","${t.status}"\n`);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'Tasks_Report.csv'; a.click();
   };
 </script>
 </body>
